@@ -1,0 +1,4 @@
+geohash
+=======
+
+libgeohash php wrapper
