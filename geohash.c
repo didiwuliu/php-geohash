@@ -151,7 +151,7 @@ PHP_FUNCTION(confirm_geohash_compiled)
 	}
 
 	len = spprintf(&strg, 0, "Congratulations! You have successfully modified ext/%.78s/config.m4. Module %.78s is now compiled into PHP.", "geohash", arg);
-	RETURN_STRINGL(strg, len, 0);
+	RETURN_STRINGL(strg, len);
 }
 /* }}} */
 /* The previous line is meant for vim and emacs, so it can correctly fold and 
@@ -164,15 +164,14 @@ PHP_FUNCTION(confirm_geohash_compiled)
    ; */
 PHP_FUNCTION(geohash_verify_hash)
 {
-	char *hash = NULL;
+	zend_string *hash = NULL;
 	int argc = ZEND_NUM_ARGS();
-	int hash_len = 0;
 
-	if (zend_parse_parameters(argc TSRMLS_CC, "s", &hash, &hash_len) == FAILURE) {
+	if (zend_parse_parameters(argc TSRMLS_CC, "S", &hash) == FAILURE) {
 		RETURN_FALSE;
 	}
 
-	if(hash_len > 0 && GEOHASH_verify_hash(hash)) {
+	if(ZSTR_LEN(hash) > 0 && GEOHASH_verify_hash(ZSTR_VAL(hash))) {
 		RETURN_TRUE;
 	}
 
@@ -205,7 +204,7 @@ PHP_FUNCTION(geohash_encode)
 	if(hash == NULL) {
 		RETURN_FALSE;
 	}
-	RETURN_STRINGL(hash, strlen(hash), 0);
+	RETURN_STRING(hash);
 }
 /* }}} */
 
@@ -213,19 +212,18 @@ PHP_FUNCTION(geohash_encode)
    ; */
 PHP_FUNCTION(geohash_decode)
 {
-	char *hash = NULL;
 	int argc = ZEND_NUM_ARGS();
-	int hash_len = 0;
+	zend_string *hash = NULL;
 
-	if (zend_parse_parameters(argc TSRMLS_CC, "s", &hash, &hash_len) == FAILURE) {
+	if (zend_parse_parameters(argc TSRMLS_CC, "S", &hash) == FAILURE) {
 		RETURN_FALSE;
 	}
 
-	if(hash_len == 0) {
+	if(ZSTR_VAL(hash) == 0) {
 		RETURN_FALSE;
 	}
 
-	GEOHASH_area * area = GEOHASH_decode(hash);
+	GEOHASH_area * area = GEOHASH_decode(ZSTR_VAL(hash));
 	if(area == NULL) {
 		RETURN_FALSE;
 	}
@@ -245,24 +243,23 @@ PHP_FUNCTION(geohash_decode)
    ; */
 PHP_FUNCTION(geohash_get_neighbors)
 {
-	char *hash = NULL;
 	int argc = ZEND_NUM_ARGS();
-	int hash_len = 0;
+	zend_string *hash = NULL;
 
-	if (zend_parse_parameters(argc TSRMLS_CC, "s", &hash, &hash_len) == FAILURE) {
+	if (zend_parse_parameters(argc TSRMLS_CC, "S", &hash) == FAILURE) {
 		RETURN_FALSE;
 	}
-	if(hash_len == 0) {
+	if(ZSTR_LEN(hash) == 0) {
 		RETURN_FALSE;
 	}
 
-	GEOHASH_neighbors * neighbors = GEOHASH_get_neighbors(hash);
+	GEOHASH_neighbors * neighbors = GEOHASH_get_neighbors(ZSTR_VAL(hash));
 	if(neighbors == NULL) {
 		RETURN_FALSE;
 	}
 
 #define ADD_ASSOC_STRINGL(return_value, neighbors, name) \
-	add_assoc_stringl((return_value), #name, neighbors->name, strlen(neighbors->name) + 1, 0)
+	add_assoc_string((return_value), #name, neighbors->name)
 
 	array_init(return_value);
 	ADD_ASSOC_STRINGL(return_value, neighbors, north);
@@ -283,12 +280,11 @@ PHP_FUNCTION(geohash_get_neighbors)
    ; */
 PHP_FUNCTION(geohash_get_adjacent)
 {
-	char *hash = NULL;
 	int argc = ZEND_NUM_ARGS();
-	int hash_len;
 	long direction;
+	zend_string *hash = NULL;
 
-	if (zend_parse_parameters(argc TSRMLS_CC, "sl", &hash, &hash_len, &direction) == FAILURE) {
+	if (zend_parse_parameters(argc TSRMLS_CC, "Sl", &hash, &direction) == FAILURE) {
 		RETURN_FALSE;
 	}
 
@@ -296,11 +292,11 @@ PHP_FUNCTION(geohash_get_adjacent)
 		RETURN_FALSE;
 	}
 
-	char * _hash = GEOHASH_get_adjacent(hash, direction);
+	char * _hash = GEOHASH_get_adjacent(ZSTR_VAL(hash), direction);
 	if(_hash == NULL) {
 		RETURN_FALSE;
 	}
-	RETURN_STRINGL(_hash, strlen(_hash) + 1, 0);
+	RETURN_STRING(_hash);
 }
 /* }}} */
 
