@@ -262,7 +262,7 @@ PHP_FUNCTION(geohash_get_neighbors)
 	}
 
 #define ADD_ASSOC_STRINGL(return_value, neighbors, name) \
-	add_assoc_stringl((return_value), #name, neighbors->name, strlen(neighbors->name) + 1, 0)
+	add_assoc_stringl((return_value), #name, neighbors->name, strlen(neighbors->name), 0)
 
 	array_init(return_value);
 	ADD_ASSOC_STRINGL(return_value, neighbors, north);
@@ -300,7 +300,7 @@ PHP_FUNCTION(geohash_get_adjacent)
 	if(_hash == NULL) {
 		RETURN_FALSE;
 	}
-	RETURN_STRINGL(_hash, strlen(_hash) + 1, 0);
+	RETURN_STRINGL(_hash, strlen(_hash), 0);
 }
 /* }}} */
 
