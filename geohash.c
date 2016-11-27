@@ -9,7 +9,7 @@
 #include "php_geohash.h"
 #include "geohash_lib.h"
 
-const MAX_HASH_LENGTH = 22;
+const int MAX_HASH_LENGTH = 22;
 
 /* If you declare any globals in php_geohash.h uncomment this:
 ZEND_DECLARE_MODULE_GLOBALS(geohash)
